@@ -40,6 +40,60 @@ html, body {
 // TABLE OF CONTENTS
 ////////////////////////////////////////////////////////////////////////////////
 
+.api-endpoint {
+  margin-right: 50%;
+  padding: 0 28px;
+  box-sizing: border-box;
+  display: block;
+  clear: none !important;
+}
+
+.api-endpoint .endpoint-data {
+  background-color: #292929;
+  color: #fff;
+  border-radius: 5px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #404040;
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.4);
+  margin: 15px 0;
+  height: 38px;
+}
+
+.api-endpoint .endpoint-data i {
+  display: inline-block;
+  margin: 5px;
+  padding: 4px 12px;
+  line-height: 20px
+}
+
+.label-get {
+  background: #008000
+}
+
+.label-post, .label-put {
+  background: #4e92d7;
+}
+
+.label {
+  border-radius: 2px;
+  text-transform: uppercase;
+  font-style: normal;
+  white-space: nowrap
+}
+
+.content code, .content pre, .api-endpoint .endpoint-data h6 {
+  font-family: Consolas, Menlo, Monaco, "Lucida Console", "Liberation Mono", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Courier New", monospace, serif;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.api-endpoint .endpoint-data h6 {
+  display: inline-block;
+  margin: 0;
+  text-transform: lowercase;
+  font-weight: 400;
+}
+
 #toc > ul > li > a > span {
   float: right;
   background-color: #2484FF;
@@ -74,8 +128,10 @@ html, body {
   // This is the logo at the top of the ToC
   .logo {
     display: block;
-    max-width: 100%;
+    max-width: 80%;
+    padding-top: 4px;
     margin-bottom: $logo-margin;
+    margin: auto;
   }
 
   &>.search {
