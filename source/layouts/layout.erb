@@ -41,6 +41,10 @@ under the License.
     <% else %>
       <%= javascript_include_tag  "all_nosearch" %>
     <% end %>
+
+  <link rel="icon" href="https://zerosix.ai/wp-content/uploads/2018/11/cropped-zerosix_wolf-32x32.png" sizes="32x32"/>
+  <link rel="icon" href="https://zerosix.ai/wp-content/uploads/2018/11/cropped-zerosix_wolf-192x192.png" sizes="192x192"/>
+  <link rel="apple-touch-icon-precomposed" href="https://zerosix.ai/wp-content/uploads/2018/11/cropped-zerosix_wolf-180x180.png"/>
   </head>
 
   <body class="<%= page_classes %>" data-languages="<%=h language_tabs.map{ |lang| lang.is_a?(Hash) ? lang.keys.first : lang }.to_json %>">

@@ -65,6 +65,30 @@ ZeroSix expects for the API keys to be included in all API requests to the serve
 
 You must use OAuth 1.0a "one-legged" authentication to ensure REST API credentials cannot be intercepted by an attacker. Typically you will use any standard OAuth 1.0a library in the language of your choice to handle the authentication, or generate the necessary parameters by following the following instructions.
 
+> Example of using OAuth library to authenticate:
+
+```php
+<?php
+// URL of listing the products
+$url = "https://www.zerosix.ai/wp-json/api/v1/products";
+
+$config = array(
+    'consumer_key' => 'YOUR_CUSTOMER_KEY',
+    'consumer_secret' => 'YOUR_CUSTOMER_SECRET',
+);
+
+$oauth = new OAuth($config['consumer_key'], $config['consumer_secret'], OAUTH_SIG_METHOD_HMACSHA1, OAUTH_AUTH_TYPE_URI);
+
+$requestInfo = $oauth->getLastResponseInfo();
+
+$oauth->fetch($url);
+$data = $oauth->getLastResponse();
+
+var_dump($data);
+?>
+
+```
+> You should use the OAuth library.
 
 ### Creating a signature
 ### Collect the request method and URL
