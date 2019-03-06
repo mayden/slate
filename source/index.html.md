@@ -167,6 +167,7 @@ The products API allows you to view individual or a batch of products.
 
 ## Product properties
 
+### Product
 Attribute | Type | Description
 --------- | ------- | -----------
 `id` | `integer` | Unique identifier for the product.
@@ -174,35 +175,45 @@ Attribute | Type | Description
 `slug` | `string` | Product slug
 `description` | `string` | Product description
 `permalink` | `string` | Product URL
-`price` | `integer` | Product price
-`related_ids` | `array` | List of related products IDs
-`categories` | `array` | List of categories. Each category has `category_id` and `category_name`
-`image` | `array` | Product image. `url`, `width`, `height` and `is_thumbail` properties. 
+`hourly-price` | `integer` | Product price
+`currency` | `string` | Default is: `USD`.
+`attributes` | `array` | Listed below.
+
+
+### Product Attributes
+
+The options for the attribute is listed from the lower efficiency to higher.
+
+Attribute | Description
+--------- | -----------
+`cpu` | Options are: `intel-celeron`, `amd-fx-8320`, `intel-i3`, `amd-ryzen-5`, `intel-i5`, `intel-i7`, `xeon-e5-2667`
+`geo` | Options are: `asia-pacific`, `australia`, `europe`, `united-states` or `global` (Worldwide)
+`gpu` | Options are: `nvidia-1060`, `nvidia-1060ti`, `nvidia-1070`, `nvidia-1070ti`, `nvidia-1080`, `nvidia-1080ti`, `nvidia-titan-xp`, `nvidia-tesla-v`.
+`network-speed` | Options are: `50mbps`, `50-100mbps`, `100-200mbps`, `500-600mbps`
+`ram` | Options are: `8gb`, `12gb`, `16gb`, `32gb`, `192gb`
+
 
 ## List all Products
 
 ```php
   <?php
-  //Initialize cURL.
-  $ch = curl_init();
-   
-  //Set the URL that you want to GET by using the CURLOPT_URL option.
-  curl_setopt($ch, CURLOPT_URL, 'https://www.zerosix.ai/wp-json/api/v1/products');
   
-  //Set CURLOPT_RETURNTRANSFER so that the content is returned as a variable.
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-   
-  //Set CURLOPT_FOLLOWLOCATION to true to follow redirects.
-  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-   
-  //Execute the request.
-  $data = curl_exec($ch);
-   
-  // $data contains all the products information
-  print_r($data);
+    $GET_URL = "https://www.zerosix.ai/wp-json/api/v1/products";
+    $data = array(
+              
+      );
   
-  //Close the cURL handle.
-  curl_close($ch);
+    $options = array(
+      'http' => array(
+        'header'  => "Content-type: application/json\r\n",
+        'method'  => 'GET',
+        'content' => json_encode($data)
+             )
+        );
+    $context  = stream_context_create($options);
+    
+    $result = file_get_contents($GET_URL, false, $context);
+
   ?>
 ```
 
@@ -218,61 +229,38 @@ Attribute | Type | Description
 
 ```json
 [
-     {
-      "id": 1,
-      "title": "NVIDIA 1080ti, 100GB SSD",
-      "slug": "nvidia-1080ti-100gb-ssd",
-      "description": "NVIDIA 1080ti with 250 GB SSD,",
-      "permalink": "https://www.zerosix.ai/product/nvidia-1080ti-100gb-ssd/",
-      "price": "0.5",
-       "related_ids":
-        [
-          "2"
-        ],
-       "categories": 
-       [
-         {
-          "category_id": 10,
-          "category_name": "1080"
-          },
-          {
-           "category_id": 11,
-           "category_name": "1080ti"
-          } 
-       ],
-       "image": 
-       [
-           "https://www.zerosix.ai/uploads/2018/11/1080ti_store-150x150.jpg",
-           150,
-           150,
-           true
-       ]
-     },
-     {
-       "id": 2,
-       "title": "NVIDIA 1080ti, 250 GB SSD",
-       "slug": "nvidia-1080ti-250gb-ssd",
-       "description": "NVIDIA 1080ti with 250 GB SSD",
-       "permalink": "https://www.zerosix.ai/product/1080ti/",
-       "price": "0.6",
-        "related_ids": 
-        [
-          "1"
-        ],
-        "categories": 
-        [
-          {
-            "category_id": 11,
-            "category_name": "1080ti"
-          }
-        ],
-          "image": [
-            "https://www.zerosix.ai/uploads/2018/11/1080ti_store-150x150.jpg",
-            150,
-            150,
-            true
-             ]
-     }
+ {
+        "id": 1,
+        "title": "NVIDIA 1060, 100 GB SSD",
+        "slug": "nvidia-1060-100-gb-ssd",
+        "description": "NVIDIA 1060 with 100 GB SSD ",
+        "permalink": "product/nvidia-1060-100-gb-ssd/",
+        "hourly-price": "0.25",
+        "currency": "USD",
+        "attributes": {
+            "cpu": "intel-i3",
+            "geo": "asia-pacific",
+            "network-speed": "50-100mbps",
+            "ram": "8gb",
+            "gpu": "nvidia-1060"
+        }
+    },
+    {
+        "id": 2,
+        "title": "NVIDIA 1080ti, 100GB SSD",
+        "slug": "nvidia-1080ti-100gb-ssd",
+        "description": "NVIDIA 1080ti with 250 GB SSD",
+        "permalink": "product/nvidia-1080ti-100gb-ssd/",
+        "hourly-price": "0.5",
+        "currency": "USD",
+        "attributes": {
+            "cpu": "intel-i3",
+            "ram": "8gb",
+            "gpu": "nvidia-1080ti",
+            "geo": "europe",
+            "network-speed": "50mbps"
+        }
+    }   
 ]
 ```
 
@@ -293,45 +281,106 @@ This API helps you to view all the products.
 *none.*
 
 
+## Filter Products by attributes
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-get">GET</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/products/</h6>
+    </div>
+</div>
+
+```json
+/* For example: we want to search a machine
+  GREATER than nvidia-1070
+  with at least 16GB RAM
+  that located in Europe 
+  and the hourly-price is between 0.3 and 0.8
+*/
+{
+	"relation": "greater",
+	"attributes": 
+	{
+		"gpu": "nvidia-1070",
+		"geo": "europe",
+		"ram": "16gb"
+	},
+	"min_price": 0.3,
+	"max_price": 0.8
+}
+```
+
+> The response of this JSON will be:
+
+```json
+[
+    {
+        "id": 1,
+        "title": "NVIDIA TitanXP",
+        "slug": "nvidia-titanxp",
+        "description": "NVIDIA TitanXp with 250 GB SSD ",
+        "permalink": "/product/nvidia-titanxp/",
+        "hourly-price": "0.7",
+        "currency": "USD",
+        "attributes": {
+            "cpu": "intel-i7",
+            "ram": "16gb",
+            "gpu": "nvidia-titan-xp",
+            "geo": "europe",
+            "network-speed": "50mbps"
+        }
+    }
+]
+
+```
+
+### HTTP Requests
+
+Parameter | Description
+--------- | -----------
+`relation` | Relation of the attributes. Must be `greater`, `equal` or `less`. 
+`attributes` | JSON Object of the required attributes. See example.
+`min_price` | Minimum hourly-price per product
+`max_price` | Maximum hourly-price per product
+
+### HTTP Responses
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+`products_invalid_relation` | `400` | Invalid relation type. Please use: greater, equal or less.
+`products_invalid_prices` | `400` | Invalid min or max price type. Please valid your input to numbers only
+`products_invalid_prices` | `400` | min price must be less than max price.
+`products_invalid_attribute` | `400` | Please input valid attributes according to the attributes table.
+
+
 ## Retrieve a Product
 
 ```shell
   curl  https://www.zerosix.ai/wp-json/api/v1/products/1  \
-        -u consumer_key:consumer_secret
+        -u consumer_key:consumer_secret \
+        -H "Content-Type: application/json" 
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-      "id": 1,
-      "title": "NVIDIA 1080ti, 100GB SSD",
-      "slug": "nvidia-1080ti-100gb-ssd",
-      "description": "NVIDIA 1080ti with 250 GB SSD,",
-      "permalink": "https://www.zerosix.ai/product/nvidia-1080ti-100gb-ssd/",
-      "price": "0.5",
-       "related_ids":
-        [
-          "2"
-        ],
-       "categories": 
-       [
-         {
-          "category_id": 10,
-          "category_name": "1080"
-          },
-          {
-           "category_id": 11,
-           "category_name": "1080ti"
-          } 
-       ],
-       "image": 
-       [
-           "https://www.zerosix.ai/uploads/2018/11/1080ti_store-150x150.jpg",
-           150,
-           150,
-           true
-       ]
+ 
+        "id": 1,
+        "title": "NVIDIA 1060, 100 GB SSD",
+        "slug": "nvidia-1060-100-gb-ssd",
+        "description": "NVIDIA 1060 with 100 GB SSD ",
+        "permalink": "product/nvidia-1060-100-gb-ssd/",
+        "hourly-price": "0.25",
+        "currency": "USD",
+        "attributes": {
+            "cpu": "intel-i3",
+            "geo": "asia-pacific",
+            "network-speed": "50-100mbps",
+            "ram": "8gb",
+            "gpu": "nvidia-1060"
+        }
+    
 }
 ```
 
@@ -355,9 +404,214 @@ Parameter | Description
 `ID` | The ID of the product to retrieve
 
 
+# Orders
+This API endpoints allows you to create new order with multiple machines , retrieve information about specific order and more.
+
+## Order properties
+
+Attribute | Type | Description
+--------- | ------- | -----------
+`order_id` | `integer` | Unique identifier for the order.
+`order_key` | `string` | Order key
+`order_status` | `string` | Order status. Options: `unlimited`, `pending`, `processing`, `on-hold`, `completed`, `cancelled`, `refunded`, `failed` and `trash`. Default is `pending`.
+`date_created` | `DateTime` | The date the order was created, in the site's timezone. Properties are: `date`, `timezone_type` and `timezone`.
+`hourly-price` | `integer` | Hourly price for this order
+`currency` | `string` | The currency. Default is: `USD`.
+`product` | `array` | Product properties: <br /> `id` - The ID of the product. <br /> `name` - Name of the ordered product.
+`img_file` | `string` | Img file URL to be loaded initially on the rented machines.
+`Bookings` | `array` | Booking properties: <br /> `id`, `status`, `start_date`, `end_date`, `machine` and `rented_hours`.
+
+## Create new order
+
+
+```php
+  <?php
+  
+    $ORDER_URL = "https://www.zerosix.ai/wp-json/api/v1/orders";
+    $data = array(
+      'product_id' => 2,
+      'instances' => 3,
+      'img_file' => "https://ww.zerosix.ai/blabla.tar.gz"
+      );
+  
+    $options = array(
+      'http' => array(
+        'header'  => "Content-type: application/json\r\n",
+        'method'  => 'PUT',
+        'content' => json_encode($data)
+             )
+        );
+    $context  = stream_context_create($options);
+    
+    $result = file_get_contents($ORDER_URL, false, $context);
+
+  ?>
+```
+
+
+```shell
+  curl  https://www.zerosix.ai/wp-json/api/v1/products  \
+        -u consumer_key:consumer_secret
+```
+
+
+
+> The above command returns JSON structured like this:
+
+```json
+[
+ {
+        "order_id": 1,
+        "order_key": "wc_order_randomchars",
+        "order_status": "unlimited",
+        "date_created": {
+            "date": "2019-01-01 00:00:00.000000",
+            "timezone_type": 3,
+            "timezone": "America/Los_Angeles"
+        },
+        "hourly-price": "0.5",
+        "currency": "USD",
+        "product": {
+            "id": 2,
+            "name": "NVIDIA 1080ti, 100GB SSD"
+        },
+        "img_file": "https://ww.zerosix.ai/blabla.tar.gz",
+        "bookings": [
+            {
+                "id": 10,
+                "status": "wc-unlimited",
+                "start_date": "January 1, 2019, 00:00 am",
+                "end_date": "",
+                "machine": "machine details",
+                "rented_hours": "1"
+            },
+            {
+                "id": 11,
+                "status": "wc-unlimited",
+                "start_date": "January 1, 2019, 00:00 am",
+                "end_date": "",
+                "machine": "machine details",
+                "rented_hours": "1"
+            },
+            {
+                "id": 12,
+                "status": "wc-unlimited",
+                "start_date": "January 1, 2019, 00:00 am",
+                "end_date": "",
+                "machine": "machine details",
+                "rented_hours": "1"
+            },
+        ]
+    }
+]
+```
+
+You can place an order with multiple instances. 
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-put">PUT</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/orders</h6>
+    </div>
+</div>
+
+### HTTP Request
+
+Parameter | Description
+--------- | -----------
+`product_id` | The product ID we want to book
+`instances` | Number of instances to start with. 
+`img_file` | Optional. URL of the img file to be loaded on the machines. 
+
+
+### HTTP Respones
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+`order_invalid_product_id` | `400` | Invalid ProductID. 
+`order_invalid_instances` | `400` | Invalid number of instances
+`order_not_available_resources` | `200` | Number of requested instances unavailable at this moment.
+
+
+## Complete an order
+
+Once you completed your order, all the machines (bookings) will be marked as `completed`, and the total cost of your rental time will be updated accordingly. 
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-del">DEL</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/orders/(ID)</h6>
+    </div>
+</div>
+
+
+### HTTP Requests
+
+Parameter | Description
+--------- | -----------
+`order_id` | `integer` | Unique identifier for the order.
+
+
+### HTTP Respones
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+`order_invalid_id` | `400` | Invalid Order ID. 
+`order_invalid_permissions` | `401` | You are not authorized to modify this order.
+`order_invalid_status` | `404` | Order has been marked already as completed. You cant delete this order. 
+
+## List all Orders
+
+List all the orders made by you. 
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-get">GET</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/orders/</h6>
+    </div>
+</div>
+
+
+### HTTP Requests
+
+Parameter | Description
+--------- | -----------
+
+
+### HTTP Respones
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+
+
+## Retrieve an Order
+
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-get">GET</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/orders/(ID)</h6>
+    </div>
+</div>
+
+
+### HTTP Requests
+
+Parameter | Description
+--------- | -----------
+`id` | The ID of the order we want to retrieve. 
+
+### HTTP Respones
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+`order_invalid_id` | `400` | Invalid Order ID. 
+`order_invalid_permissions` | `401` | You are not authorized to modify this order.
+
+
 #Bookings
 
-This API endpoints allows you to create new order, retrieve information about specific order, see available booking dates and more. 
+This API endpoints allows you to create new booking, retrieve information about specific booking, see available booking dates and more. 
 
 ## Booking properties
 
@@ -432,7 +686,9 @@ Attribute | Type | Description
 > To create new booking:
 
 ```php
+<?php
 
+// Limited duration
 $data = [
   'product_id': 1,
   'start_date': "2018-12-28 14:00",
@@ -448,6 +704,13 @@ $data = [
   'client_country': "US",
   'client_email': "john.doe@example.com",
   'client_phone': "(555) 555-5555"
+  ];
+  
+// Unlimited duration. Start immediately.  
+$data = [
+  'product_id': 1,
+  'unlimited': 1
+  // Client info
   ];
   
 ```
@@ -538,7 +801,7 @@ This API helps you to create a new booking.
 
 <div class="api-endpoint">
     <div class="endpoint-data">
-        <i class="label label-post">POST</i>
+        <i class="label label-put">PUT</i>
         <h6>https://www.zerosix.ai/wp-json/api/v1/bookings</h6>
     </div>
 </div>
@@ -551,6 +814,7 @@ Parameter | Description
 `product_id` | The product ID we want to book
 `start_date` | The start date and time we want to book. format is: `YYYY-MM-DD H:i`
 `end_date` | The end date and time we want to book. format is: `YYYY-MM-DD H:i`
+`unlimited` | If `unlimited = 1`, then the booking **starts immediately with unlimited duration**. Default is `unlimited = 0`.
 `client_id` | Optional. Your client id. 
 `client_first_name` | Optional. Your client first name.
 `client_last_name` | Optional. Your client last name.
@@ -569,7 +833,72 @@ Parameter | Description
 Parameter | Status | Description
 --------- | ----------- | -----------
 `booking_invalid_dates` | `404` | Invalid start or end dates. Please follow the format of YYYY-MM-DD H:i.
-`Error` | `400` | `"This block cannot be cooked"`, This booking is not available on this dates. Please try different times.
+`Error` | `400` | `"This block cannot be booked"`, This booking is not available on this dates. Please try different times.
+
+## Complete Booking
+
+> To complete booking:
+
+```php
+<?php
+
+    $DEL_URL = "https://www.zerosix.ai/wp-json/api/v1/bookings/<ID>";
+    $data = array();
+  
+    $options = array(
+      'http' => array(
+        'header'  => "Content-type: application/json\r\n",
+        'method'  => 'DELETE',
+        'content' => json_encode($data)
+             )
+        );
+    $context  = stream_context_create($options);
+    
+    $result = file_get_contents($GET_URL, false, $context);
+
+  ?>
+  
+
+  
+```
+
+```shell
+curl -X DELETE https://www.zerosix.ai/wp-json/api/v1/bookings/<ID> \
+    -u consumer_key:consumer_secret \
+    -H "Content-Type: application/json" \
+ 
+  
+```
+
+> JSON response example:
+*None*
+
+When user wants to finish his currently booking process **with unlimited plan**, a request should be made in order to complete the order. 
+
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-del">DEL</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/bookings/(ID)</h6>
+    </div>
+</div>
+
+### HTTP Request
+
+
+Parameter | Description
+--------- | -----------
+`id` | The booking id we want to complete.
+
+
+
+### HTTP Respones
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+`invalid_booking_id` | `404` | Invalid booking Id
+`invalid_booking_permissions` | `401` |  You are not authorized to modify this booking
+   | `204` |  No content. Everything went fine.
 
 
 ## Check available dates
@@ -612,12 +941,12 @@ curl -X GET https://www.zerosix.ai/wp-json/api/v1/bookings/available \
 ```
 
 
-In order to place a booking, you should check first the available dates and times. 
+In order to place a booking with limited duration, you should check first the available dates and times. 
 
 <div class="api-endpoint">
     <div class="endpoint-data">
         <i class="label label-get">GET</i>
-        <h6>https://www.zerosix.ai/wp-json/api/v1/bookings/available</h6>
+        <h6>... zerosix.ai/wp-json/api/v1/bookings/available</h6>
     </div>
 </div>
 
@@ -937,3 +1266,57 @@ curl -X GET https://www.zerosix.ai/wp-json/api/v1/bookings/327 \
 ### Query Parameters
 
 *none* for now.
+
+
+# Credentials
+In order to receive the credentials of the order, a request should be made. 
+
+
+
+## Receive Credentials
+
+> The response of credentials:
+
+```json
+{
+    "order_id": 1,
+    "order_key": "wc_order_randomkey",
+    "bookings": [
+        {
+            "BOOKING_ID": 2,
+            "SSH_KEY": "URL",
+            "SSH_HOSTNAME": "renter@127.0.0.1",
+            "SSH_PORT": "80"
+        },
+        {
+            "BOOKING_ID": 3,
+            "SSH_KEY": "URL",
+            "SSH_HOSTNAME": "renter@127.0.0.2",
+            "SSH_PORT": "80"
+        },
+}
+```
+
+<div class="api-endpoint">
+    <div class="endpoint-data">
+        <i class="label label-get">GET</i>
+        <h6>https://www.zerosix.ai/wp-json/api/v1/credentials/(order_key)</h6>
+    </div>
+</div>
+
+
+### HTTP Request
+
+
+Parameter | Description
+--------- | -----------
+`order_key` | Must mention an `order_key` to receive the credentials. 
+
+
+
+### HTTP Respones
+
+Parameter | Status | Description
+--------- | ----------- | -----------
+`credentials_invalid_order_key` | `400` | Invalid Order Key
+`credentials_invalid_id` | `400` |  Problem with order_key. Please mention valid order_key
